@@ -27,24 +27,33 @@
 #
 #
 
-if [ -z "$SOURCE" ]; then
-	echo "SOURCE is not defined"
-	exit
-fi
-
-if [ -z "$SSH_HOST" ]; then
-	echo "SSH_HOST is not defined"
-	exit
-fi
-
-if [ -z "$SSH_PATH" ]; then
-	echo "SSH_PATH is not defined"
-	exit
-fi
-
-
 DATE=`date "+%Y-%m-%dT%H:%M:%S"`
-TARGET="$SSH_HOST:$SSH_PATH/incomplete-$DATE"
+if [ -z $DSTPATH ]; then
+	# SSH
+	if [ -z "$SOURCE" ]; then
+		echo "SOURCE is not defined"
+		exit
+	fi
+
+	if [ -z "$SSH_HOST" ]; then
+		echo "SSH_HOST is not defined"
+		exit
+	fi
+
+	if [ -z "$SSH_PATH" ]; then
+		echo "SSH_PATH is not defined"
+		exit
+	fi
+	INC_PATH="$SSH_PATH/incomplete-$DATE"
+	TARGET="$SSH_HOST:$INC_PATH"
+else
+	# Local
+	INC_PATH="$DSTPATH/incomplete-$DATE"
+	TARGET=$INC_PATH
+fi
+
+
+
 
 EXCLUDEFILE="$HOME/.rsync/exclude"
 
@@ -53,7 +62,7 @@ RSYNC_ARGS="-azP \
 	--delete \
 	--delete-excluded \
 	--exclude-from=$EXCLUDEFILE \
-	--link-dest=../current \
+	--link-dest=$SSH_PATH/current \
 	$SOURCE $TARGET"
 
 # Check rsync
@@ -76,16 +85,35 @@ fi
 
 CMD="$RSYNC $RSYNC_ARGS"
 
+if [ -z $DSTPATH ]; then
+	# SSH
+	echo "Creating $INC_PATH"
+	ssh $SSH_HOST mkdir $INC_PATH
+else
+	# Local
+	mkdir $INC_PATH
+fi
+
+
 # Wait for keypress
 echo "Preparing to snapshot"
 echo "    Command: $CMD"
 echo "<Press any key to continue>"
 read
 
-$CMD \
-&& ssh $SSH_HOST \
-"mv $SSH_PATH/incomplete-$DATE $SSH_PATH/backup-$DATE \
-&& rm -f $SSH_PATH/current \
-&& ln -s backup-$DATE $SSH_PATH/current"
 
+if [ -z $DSTPATH ]; then
+	# SSH
+	$CMD \
+	&& ssh $SSH_HOST \
+	"mv $SSH_PATH/incomplete-$DATE $SSH_PATH/backup-$DATE \
+	&& rm -f $SSH_PATH/current \
+	&& ln -s backup-$DATE $SSH_PATH/current"
+else
+	# Local
+	$CMD \
+	&& mv $INC_PATH $DSTPATH/backup-$DATE \
+	&& rm -f $DSTPATH/current \
+	&& ln -s $DSTPATH/backup-$DATE $DSTPATH/current
+fi
 
