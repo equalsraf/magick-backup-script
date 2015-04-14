@@ -46,10 +46,12 @@ if [ -z $DSTPATH ]; then
 	fi
 	INC_PATH="$SSH_PATH/incomplete-$DATE"
 	TARGET="$SSH_HOST:$INC_PATH"
+	LINKPATH="$SSH_PATH/current"
 else
 	# Local
 	INC_PATH="$DSTPATH/incomplete-$DATE"
 	TARGET=$INC_PATH
+	LINKPATH="$DSTPATH/current"
 fi
 
 
@@ -62,7 +64,7 @@ RSYNC_ARGS="-azP \
 	--delete \
 	--delete-excluded \
 	--exclude-from=$EXCLUDEFILE \
-	--link-dest=$SSH_PATH/current \
+	--link-dest=$LINKPATH \
 	$SOURCE $TARGET"
 
 # Check rsync
