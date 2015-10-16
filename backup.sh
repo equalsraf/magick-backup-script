@@ -62,6 +62,8 @@ EXCLUDEFILE="$HOME/.rsync/exclude"
 RSYNC=/usr/bin/rsync
 RSYNC_ARGS="-azP \
 	--delete \
+	-q \
+	--no-specials \
 	--delete-excluded \
 	--exclude-from=$EXCLUDEFILE \
 	--link-dest=$LINKPATH \
