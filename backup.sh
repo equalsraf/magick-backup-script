@@ -25,6 +25,7 @@
 #
 # . backup.sh
 #
+# or using $DSTPATH for local backups.
 #
 
 DATE=`date "+%Y-%m-%dT%H:%M:%S"`
