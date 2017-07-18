@@ -65,6 +65,7 @@ RSYNC_ARGS="-azP \
 	--delete \
 	-q \
 	--no-specials \
+	--progress \
 	--delete-excluded \
 	--exclude-from=$EXCLUDEFILE \
 	--link-dest=$LINKPATH \
