@@ -119,7 +119,6 @@ else
 	# Local
 	$CMD \
 	&& mv $INC_PATH $DSTPATH/backup-$DATE \
-	&& rm -f $DSTPATH/current \
-	&& ln -s $DSTPATH/backup-$DATE $DSTPATH/current
+	&& ln -s -f -T $DSTPATH/backup-$DATE $DSTPATH/current
 fi
 
